@@ -24,34 +24,41 @@ public class Sensor : MonoBehaviour
     private TCPmsg msg;
     private TCP_Client client;
     private Vector3 prevAcc;
+    private int count;
     // Start is called before the first frame update
     void Start()
     {
         msg = new TCPmsg();
         Input.gyro.enabled = true;
         client = this.GetComponent<TCP_Client>();
+        count = 0;
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        Vector3 acc = GetAccelerometer();
-        Quaternion rot = GetGyroscope();
+        if (count % 2 == 0) {
+            Vector3 acc = GetAccelerometer();
+            Quaternion rot = GetGyroscope();
 
-        //Accelerometer_text.text = acc.ToString();
-        Gyroscope_text.text = rot.ToString();
+            //Accelerometer_text.text = acc.ToString();
+            Gyroscope_text.text = rot.ToString();
 
-        // msg.tx = acc.x.ToString();
-        // msg.ty = acc.y.ToString();
-        // msg.tz = (-acc.z).ToString();
+            // msg.tx = acc.x.ToString();
+            // msg.ty = acc.y.ToString();
+            // msg.tz = (-acc.z).ToString();
 
-        msg.rx = rot.x.ToString();
-        msg.ry = rot.y.ToString();
-        msg.rz = rot.z.ToString();
-        msg.rw = rot.w.ToString();
+            msg.rx = rot.x.ToString();
+            msg.ry = rot.y.ToString();
+            msg.rz = rot.z.ToString();
+            msg.rw = rot.w.ToString();
 
-        client.SendMessage(JsonUtility.ToJson(msg));
-
+            client.SendMessage(JsonUtility.ToJson(msg));
+            if (count > 10000) {
+                count = 0;
+            }
+        }
+        count++;
     }
 
     private Vector3 GetAccelerometer()
