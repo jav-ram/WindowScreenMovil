@@ -35,7 +35,7 @@ public class TCP_Client : MonoBehaviour {
 	private void ListenForData() { 		
 		try { 			
 			socketConnection = new TcpClient(ip, 8052);  			
-			Byte[] bytes = new Byte[1024];             
+			Byte[] bytes = new Byte[4096];             
 			while (true) { 				
 				// Get a stream object for reading 
 				if (socketConnection != null) {	
@@ -60,8 +60,8 @@ public class TCP_Client : MonoBehaviour {
 	/// <summary> 	
 	/// Send message to server using socket connection. 	
 	/// </summary> 	
-	public void SendMessage(string msg) {         
-		if (socketConnection == null) {             
+	public void SendMessage(string msg) {
+		if (socketConnection == null) {
 			return;         
 		}  		
 		try { 			
