@@ -13,7 +13,6 @@ public class TCPmsg
     public string rx;
     public string ry;
     public string rz;
-    public string rw;
 
     public string reset;
 }
@@ -22,72 +21,55 @@ public class Sensor : MonoBehaviour
 {
     public Text Accelerometer_text;
     public Text Gyroscope_text;
-    public int scale;
 
     private TCPmsg msg;
     private TCP_Client client;
     private Vector3 prevPos;
-    private int count;
+
     // Start is called before the first frame update
     void Start()
     {
         msg = new TCPmsg();
         Input.gyro.enabled = true;
-        client = this.GetComponent<TCP_Client>();
-        count = 0;
+        client = GameObject.Find("NetworkManager").GetComponent<TCP_Client>();
+        Accelerometer_text = GameObject.Find("Accelerometer").GetComponent<Text>();
+        Gyroscope_text = GameObject.Find("Gyroscope").GetComponent<Text>();
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (count % 2 == 0) {
-            Vector3 pos = GetDifPosition();
-            Quaternion rot = GetGyroscope();
+        Vector3 pos = GetDifPosition();
+        Vector3 rot = GetGyroscope();
+
+        Accelerometer_text.text = transform.position.ToString();
+        Gyroscope_text.text = rot.ToString();
 
 
+        msg.tx = System.Math.Round(pos.x, 6).ToString();
+        msg.ty = System.Math.Round(pos.y, 6).ToString();
+        msg.tz = System.Math.Round(pos.z, 6).ToString();
 
-            Accelerometer_text.text = transform.position.ToString();
-            Gyroscope_text.text = rot.ToString();
+        msg.rx = System.Math.Round(rot.x, 6).ToString();
+        msg.ry = System.Math.Round(rot.y, 6).ToString();
+        msg.rz = System.Math.Round(rot.z, 6).ToString();
 
+        client.SendMessage(JsonUtility.ToJson(msg));
 
-            msg.tx = System.Math.Round(pos.x, 6).ToString();
-            msg.ty = System.Math.Round(pos.y, 6).ToString();
-            msg.tz = System.Math.Round(pos.z, 6).ToString();
-
-            msg.rx = System.Math.Round(rot.x, 6).ToString();
-            msg.ry = System.Math.Round(rot.y, 6).ToString();
-            msg.rz = System.Math.Round(rot.z, 6).ToString();
-            msg.rw = System.Math.Round(rot.w, 6).ToString();
-
-            client.SendMessage(JsonUtility.ToJson(msg));
-            if (count > 10000) {
-                count = 0;
-            }
-        }
-        count++;
     }
 
     private Vector3 GetDifPosition()
     {
-        Vector3 pos = transform.position;
-        Vector3 dif = prevPos - pos;
-        prevPos = pos;
-        
-        Vector3 r = Vector3.Lerp(Vector3.zero, dif, dif.magnitude);
+        // Vector3 pos = transform.position;
+        // Vector3 dif = pos - prevPos;
+        // prevPos = pos;
         return transform.position;
     }
 
     // Get Gyroscope
-    private Quaternion GetGyroscope()
+    private Vector3 GetGyroscope()
     {
-        return transform.rotation;
-    }
-
-    public void SetBack() {
-        msg.reset = "true";
-        client.SendMessage(JsonUtility.ToJson(msg));
-        transform.position = Vector3.zero;
-        msg.reset = "";
+        return transform.rotation.eulerAngles;
     }
     
 }
