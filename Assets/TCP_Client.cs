@@ -7,24 +7,24 @@ using System.Threading;
 using UnityEngine;
 
 public class TCP_Client : MonoBehaviour {
-	#region private members 	
-	private TcpClient socketConnection; 	
-	private Thread clientReceiveThread; 	
+	#region private members
+	private TcpClient socketConnection;
+	private Thread clientReceiveThread;
     private string ip;
 	private int port;
-	#endregion  	
-	// Use this for initialization 	
+	#endregion
+	// Use this for initialization
 	void Start () {
 		ConnectToTcpServer("192.168.1.17", 8052);
-	} 	
-	/// <summary> 	
-	/// Setup socket connection. 	
-	/// </summary> 	
-	public void ConnectToTcpServer (string ip_, int port_) { 		
+	}
+	/// <summary>
+	/// Setup socket connection.
+	/// </summary>
+	public void ConnectToTcpServer (string ip_, int port_) {
 		Debug.Log("test1");
 		ip = ip_;
 		port = port_;
-		try {  			
+		try {
 			clientReceiveThread = new Thread (new ThreadStart(ListenForData)); 			
 			clientReceiveThread.IsBackground = true;
 			clientReceiveThread.Start();
